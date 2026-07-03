@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block title %}Bookings{% endblock %}
+{% block page_title %}Manage Bookings{% endblock %}
+{% block content %}
+<div class="table-card">
+  <div class="table-header">
+    <h3><i class="fas fa-calendar-check" style="color:var(--primary);margin-right:10px"></i>All Bookings ({{ bookings|length }})</h3>
+  </div>
+  <table>
+    <thead><tr><th>Client</th><th>Service</th><th>Phone</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for b in bookings %}
+      <tr>
+        <td><strong>{{ b.name }}</strong><br><small style="color:var(--muted)">{{ b.email }}</small></td>
+        <td>{{ b.service.name if b.service else 'N/A' }}</td>
+        <td>{{ b.phone }}</td>
+        <td style="color:var(--muted);font-size:0.85rem;max-width:200px">{{ b.message[:60] if b.message else '—' }}</td>
+        <td style="color:var(--muted);font-size:0.8rem">{{ b.created_at.strftime('%d %b %Y') }}</td>
+        <td><span class="status {{ b.status }}">{{ b.status.title() }}</span></td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <a href="/admin/bookings/status/{{ b.id }}/confirmed" class="btn btn-success btn-sm">Confirm</a>
+          <a href="/admin/bookings/status/{{ b.id }}/completed" class="btn btn-sm" style="background:rgba(33,150,243,0.15);color:#2196f3">Done</a>
+          <a href="/admin/bookings/status/{{ b.id }}/cancelled" class="btn btn-danger btn-sm">Cancel</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:40px">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

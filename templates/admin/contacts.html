@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Messages{% endblock %}
+{% block page_title %}Contact Messages{% endblock %}
+{% block content %}
+<div class="table-card">
+  <div class="table-header">
+    <h3><i class="fas fa-envelope" style="color:var(--primary);margin-right:10px"></i>All Messages ({{ contacts|length }})</h3>
+  </div>
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th></tr></thead>
+    <tbody>
+      {% for c in contacts %}
+      <tr>
+        <td><strong>{{ c.name }}</strong></td>
+        <td><a href="mailto:{{ c.email }}" style="color:var(--primary)">{{ c.email }}</a></td>
+        <td>{{ c.subject or '—' }}</td>
+        <td style="color:var(--muted);font-size:0.85rem;max-width:300px">{{ c.message[:100] }}...</td>
+        <td style="color:var(--muted);font-size:0.8rem">{{ c.created_at.strftime('%d %b %Y') }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:40px">No messages yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

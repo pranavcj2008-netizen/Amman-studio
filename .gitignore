@@ -1,0 +1,24 @@
+# Database
+instance/
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+env/
+
+# Uploads
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Launchers (not needed on server)
+START.vbs
+RUN.bat
+START_WEBSITE.bat

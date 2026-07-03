@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(255,107,53,0.15);color:#ff6b35"><i class="fas fa-th-large"></i></div>
+    <div class="stat-num">{{ stats.services }}</div>
+    <div class="stat-label">Total Services</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(255,193,7,0.15);color:#ffc107"><i class="fas fa-calendar-check"></i></div>
+    <div class="stat-num">{{ stats.bookings }}</div>
+    <div class="stat-label">Total Bookings</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(0,200,83,0.15);color:#00c853"><i class="fas fa-clock"></i></div>
+    <div class="stat-num">{{ stats.pending }}</div>
+    <div class="stat-label">Pending Bookings</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(33,150,243,0.15);color:#2196f3"><i class="fas fa-envelope"></i></div>
+    <div class="stat-num">{{ stats.contacts }}</div>
+    <div class="stat-label">Messages</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(156,39,176,0.15);color:#9c27b0"><i class="fas fa-star"></i></div>
+    <div class="stat-num">{{ stats.reviews }}</div>
+    <div class="stat-label">Reviews</div>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-header">
+    <h3><i class="fas fa-calendar-check" style="color:var(--primary);margin-right:10px"></i>Recent Bookings</h3>
+    <a href="/admin/bookings" class="btn btn-primary btn-sm">View All</a>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Client</th><th>Service</th><th>Phone</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for b in recent_bookings %}
+      <tr>
+        <td><strong>{{ b.name }}</strong><br><small style="color:var(--muted)">{{ b.email }}</small></td>
+        <td>{{ b.service.name if b.service else 'N/A' }}</td>
+        <td>{{ b.phone }}</td>
+        <td style="color:var(--muted);font-size:0.8rem">{{ b.created_at.strftime('%d %b %Y') }}</td>
+        <td><span class="status {{ b.status }}">{{ b.status.title() }}</span></td>
+        <td>
+          <a href="/admin/bookings/status/{{ b.id }}/confirmed" class="btn btn-success btn-sm">Confirm</a>
+          <a href="/admin/bookings/status/{{ b.id }}/completed" class="btn btn-sm" style="background:rgba(33,150,243,0.15);color:#2196f3">Done</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:40px">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

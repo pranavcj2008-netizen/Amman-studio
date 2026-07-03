@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Help Center - Amman Studio{% endblock %}
+{% block extra_css %}
+<style>
+.help-hero { padding: 160px 5% 80px; text-align: center; background: radial-gradient(ellipse at center, rgba(255,107,53,0.1) 0%, transparent 60%); }
+.help-hero h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 16px; }
+.search-wrap { max-width: 600px; margin: 30px auto 0; position: relative; }
+.search-wrap input { width: 100%; padding: 18px 60px 18px 24px; background: var(--card); border: 1.5px solid rgba(255,107,53,0.2); border-radius: 50px; color: var(--text); font-family: 'Poppins',sans-serif; font-size: 1rem; transition: all 0.3s; }
+.search-wrap input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255,107,53,0.1); }
+.search-wrap button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: var(--primary); border: none; width: 44px; height: 44px; border-radius: 50%; color: white; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+.search-wrap button:hover { background: #e55a25; transform: translateY(-50%) scale(1.1); }
+
+/* Categories */
+.help-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 0 5% 60px; }
+.cat-card { background: var(--card); border-radius: 20px; padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.4s; text-decoration: none; color: var(--text); }
+.cat-card:hover { transform: translateY(-8px); border-color: rgba(255,107,53,0.4); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+.cat-card.active { border-color: var(--primary); background: rgba(255,107,53,0.08); }
+.cat-icon { width: 60px; height: 60px; border-radius: 16px; background: rgba(255,107,53,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary); margin: 0 auto 16px; transition: all 0.4s; }
+.cat-card:hover .cat-icon { background: var(--primary); color: white; transform: rotate(10deg); }
+.cat-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+.cat-card p { color: var(--muted); font-size: 0.8rem; }
+
+/* FAQ */
+.faq-section { padding: 0 5% 80px; max-width: 860px; margin: 0 auto; }
+.faq-group { margin-bottom: 40px; display: none; }
+.faq-group.active { display: block; }
+.faq-group-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+.faq-item { background: var(--card); border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: border 0.3s; }
+.faq-item.open { border-color: rgba(255,107,53,0.3); }
+.faq-q { padding: 20px 24px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: color 0.3s; }
+.faq-q:hover { color: var(--primary); }
+.faq-q i { color: var(--primary); font-size: 0.85rem; transition: transform 0.4s; flex-shrink: 0; }
+.faq-item.open .faq-q i { transform: rotate(180deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s; }
+.faq-a p { padding: 0 24px 20px; color: var(--muted); line-height: 1.8; font-size: 0.9rem; }
+.faq-item.open .faq-a { max-height: 300px; }
+
+/* Still need help */
+.help-cta { background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(247,197,159,0.05)); border: 1px solid rgba(255,107,53,0.2); border-radius: 24px; padding: 60px; text-align: center; margin: 0 5% 80px; }
+.help-cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+.help-cta p { color: var(--muted); margin-bottom: 28px; }
+.help-cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="help-hero">
+  <div class="section-badge animate-fade-up"><i class="fas fa-life-ring"></i> Help Center</div>
+  <h1 class="animate-fade-up delay-1">How can we <span style="color:var(--primary)">help you?</span></h1>
+  <p style="color:var(--muted);font-size:1.05rem" class="animate-fade-up delay-2">Search for answers or browse topics below</p>
+  <div class="search-wrap animate-fade-up delay-3">
+    <input type="text" id="searchInput" placeholder="Search for answers... e.g. booking, payment, delivery">
+    <button onclick="searchFAQ()"><i class="fas fa-search"></i></button>
+  </div>
+</div>
+
+<!-- Categories -->
+<div class="help-cats">
+  <a class="cat-card reveal active" onclick="showCategory('all',this)">
+    <div class="cat-icon"><i class="fas fa-th"></i></div>
+    <h4>All Topics</h4>
+    <p>Browse everything</p>
+  </a>
+  <a class="cat-card reveal delay-1" onclick="showCategory('booking',this)">
+    <div class="cat-icon"><i class="fas fa-calendar-check"></i></div>
+    <h4>Booking</h4>
+    <p>How to book services</p>
+  </a>
+  <a class="cat-card reveal delay-2" onclick="showCategory('payment',this)">
+    <div class="cat-icon"><i class="fas fa-rupee-sign"></i></div>
+    <h4>Payment</h4>
+    <p>Pricing & billing</p>
+  </a>
+  <a class="cat-card reveal delay-3" onclick="showCategory('delivery',this)">
+    <div class="cat-icon"><i class="fas fa-paper-plane"></i></div>
+    <h4>Delivery</h4>
+    <p>How we deliver work</p>
+  </a>
+  <a class="cat-card reveal delay-4" onclick="showCategory('revisions',this)">
+    <div class="cat-icon"><i class="fas fa-redo"></i></div>
+    <h4>Revisions</h4>
+    <p>Edit & revision policy</p>
+  </a>
+  <a class="cat-card reveal delay-5" onclick="showCategory('services',this)">
+    <div class="cat-icon"><i class="fas fa-th-large"></i></div>
+    <h4>Services</h4>
+    <p>What we offer</p>
+  </a>
+</div>
+
+<!-- FAQs -->
+<div class="faq-section">
+
+  <div class="faq-group active" data-cat="booking">
+    <div class="faq-group-title"><i class="fas fa-calendar-check"></i> Booking</div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I book a service? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Simply go to our <a href="/booking" style="color:var(--primary)">Booking page</a>, fill in your name, phone, email, select the service you need, and submit. We will contact you within 2-4 hours to confirm your booking.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I cancel or reschedule my booking? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Yes! You can cancel or reschedule your booking up to 24 hours before the scheduled time. Contact us via phone at +91 73392 78064 or email pranavcj2008@gmail.com.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">How soon will I get a confirmation? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We confirm all bookings within 2-4 hours during working hours (Mon-Sat 9AM to 8PM). You will receive a WhatsApp or phone call from our team.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I book multiple services at once? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Absolutely! You can book multiple services. Just mention all the services you need in the message/requirements field when booking, or contact us directly.</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group active" data-cat="payment">
+    <div class="faq-group-title"><i class="fas fa-rupee-sign"></i> Payment</div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">What payment methods do you accept? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We accept UPI (GPay, PhonePe, Paytm), bank transfer, and cash. Payment details will be shared after booking confirmation.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Do I need to pay in advance? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We require a 50% advance payment to confirm your booking. The remaining 50% is due upon delivery of the final work.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Are there any hidden charges? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>No hidden charges at all! The price shown on our services page is the final price. We believe in 100% transparent pricing.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Do you offer discounts for bulk orders? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Yes! We offer special discounts for bulk orders and long-term clients. Contact us directly to discuss custom pricing for your needs.</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group active" data-cat="delivery">
+    <div class="faq-group-title"><i class="fas fa-paper-plane"></i> Delivery</div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">How will I receive my final files? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We deliver all final files via Google Drive, WhatsApp, or email — whichever you prefer. High-resolution files are always included.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">How long does delivery take? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Delivery time depends on the service: Logo Design (2-3 days), Video Editing (3-5 days), Website Design (7-14 days), Photography (1-2 days after session). Rush delivery is available on request.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">What file formats do you deliver? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We deliver in all standard formats: PNG, JPG, PDF, AI, PSD for design; MP4, MOV for video; and all source files are included on request.</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group active" data-cat="revisions">
+    <div class="faq-group-title"><i class="fas fa-redo"></i> Revisions</div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">How many revisions do I get? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We offer unlimited revisions until you are 100% satisfied with the final result. Your satisfaction is our top priority.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">What if I'm not happy with the work? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>If you're not satisfied, we will redo the work completely at no extra cost. We have a 100% satisfaction guarantee on all our services.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I request changes after final delivery? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Yes, minor changes can be requested within 7 days of final delivery for free. Major changes after that may be charged at a small fee.</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group active" data-cat="services">
+    <div class="faq-group-title"><i class="fas fa-th-large"></i> Services</div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">What services does Amman Studio offer? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>We offer Photography, Video Editing, Graphic Design (Logo, Social Media, Branding), and Web Design & Development. Visit our <a href="/services" style="color:var(--primary)">Services page</a> for the full list.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Do you offer custom service packages? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Yes! We can create custom packages combining multiple services at a discounted rate. Contact us at pranavcj2008@gmail.com or call +91 73392 78064.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q" onclick="toggleFaq(this)">Do you work with businesses and individuals? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-a"><p>Absolutely! We work with individuals, small businesses, startups, and large companies. Everyone deserves great creative work!</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Still need help -->
+<div class="help-cta reveal">
+  <img src="/static/images/pranav.jpg" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--primary);padding:4px;background:var(--card);margin-bottom:16px;object-fit:cover">
+  <h2>Still need <span style="color:var(--primary)">help?</span></h2>
+  <p>Can't find what you're looking for? Reach out to Pranav directly!</p>
+  <div class="help-cta-btns">
+    <a href="https://wa.me/917339278064" target="_blank" class="btn btn-primary"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+    <a href="/contact" class="btn btn-outline"><i class="fas fa-envelope"></i> Send a Message</a>
+    <a href="tel:+917339278064" class="btn btn-outline"><i class="fas fa-phone"></i> Call Now</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+function showCategory(cat, el) {
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.faq-group').forEach(g => {
+    if (cat === 'all') {
+      g.classList.add('active');
+    } else {
+      g.classList.toggle('active', g.dataset.cat === cat);
+    }
+  });
+}
+
+function searchFAQ() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  if (!q) return;
+  document.querySelectorAll('.faq-group').forEach(g => g.classList.add('active'));
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? 'block' : 'none';
+  });
+}
+document.getElementById('searchInput').addEventListener('keyup', e => {
+  if (e.key === 'Enter') searchFAQ();
+  if (!e.target.value) {
+    document.querySelectorAll('.faq-item').forEach(i => i.style.display = 'block');
+  }
+});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+{% endblock %}

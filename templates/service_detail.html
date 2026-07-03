@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ service.name }} - Amman Studio{% endblock %}
+{% block extra_css %}
+<style>
+.detail-hero { padding: 160px 5% 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.detail-icon { height: 350px; background: linear-gradient(135deg, #1a1a1a, #252525); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 8rem; color: var(--primary); border: 1px solid rgba(255,107,53,0.2); }
+.detail-cat { display: inline-block; background: rgba(255,107,53,0.15); color: var(--primary); padding: 6px 18px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+.detail-title { font-size: 3rem; font-weight: 900; margin-bottom: 20px; }
+.detail-price { font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 30px; }
+.detail-desc { color: var(--muted); line-height: 1.8; font-size: 1.05rem; margin-bottom: 30px; }
+.detail-features { list-style: none; margin-bottom: 36px; }
+.detail-features li { padding: 10px 0; color: var(--muted); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.detail-features li i { color: var(--primary); width: 20px; }
+.reviews-section { padding: 80px 5%; }
+.reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 40px; }
+.review-card { background: var(--card); border-radius: 20px; padding: 28px; border: 1px solid rgba(255,255,255,0.05); }
+.review-form { background: var(--card); border-radius: 24px; padding: 40px; margin-top: 50px; border: 1px solid rgba(255,107,53,0.15); }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--text); font-family: 'Poppins',sans-serif; font-size: 0.95rem; transition: border 0.3s; }
+.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+.stars-input { display: flex; gap: 8px; font-size: 1.5rem; cursor: pointer; }
+.stars-input i { color: rgba(255,255,255,0.2); transition: color 0.2s; }
+.stars-input i.active { color: var(--gold); }
+@media(max-width:768px) { .detail-hero { grid-template-columns: 1fr; } .detail-icon { height: 200px; font-size: 5rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-hero">
+  <div class="detail-icon animate-fade-up animate-float">
+    {% if service.category == 'Photography' %}<i class="fas fa-camera"></i>
+    {% elif service.category == 'Video' %}<i class="fas fa-video"></i>
+    {% elif service.category == 'Design' %}<i class="fas fa-paint-brush"></i>
+    {% elif service.category == 'Web' %}<i class="fas fa-code"></i>
+    {% else %}<i class="fas fa-star"></i>{% endif %}
+  </div>
+  <div class="animate-fade-up delay-1">
+    <div class="detail-cat">{{ service.category }}</div>
+    <h1 class="detail-title">{{ service.name }}</h1>
+    <div class="detail-price">₹{{ service.price|int }} <span style="font-size:1rem;color:var(--muted);font-weight:400">/ service</span></div>
+    <p class="detail-desc">{{ service.description }}</p>
+    <ul class="detail-features">
+      <li><i class="fas fa-check"></i>Professional quality guaranteed</li>
+      <li><i class="fas fa-check"></i>Quick turnaround time</li>
+      <li><i class="fas fa-check"></i>Unlimited revisions</li>
+      <li><i class="fas fa-check"></i>100% satisfaction guarantee</li>
+      <li><i class="fas fa-check"></i>Direct communication with team</li>
+    </ul>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <a href="/booking?service={{ service.id }}" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Book This Service</a>
+      <a href="/contact" class="btn btn-outline"><i class="fas fa-envelope"></i> Ask a Question</a>
+    </div>
+  </div>
+</div>
+
+<section class="reviews-section">
+  <div class="section-badge">Reviews</div>
+  <h2 class="section-title">Client <span>Reviews</span></h2>
+  <div class="reviews-grid">
+    {% for r in reviews %}
+    <div class="review-card reveal">
+      <div style="color:var(--gold);margin-bottom:12px">{% for i in range(r.rating) %}<i class="fas fa-star"></i>{% endfor %}</div>
+      <p style="color:var(--muted);font-style:italic;margin-bottom:16px">"{{ r.comment }}"</p>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700">{{ r.name[0].upper() }}</div>
+        <strong>{{ r.name }}</strong>
+      </div>
+    </div>
+    {% else %}
+    <p style="color:var(--muted)">No reviews yet. Be the first to review!</p>
+    {% endfor %}
+  </div>
+
+  <!-- Review Form -->
+  <div class="review-form reveal">
+    <h3 style="font-size:1.5rem;font-weight:700;margin-bottom:24px">Leave a <span style="color:var(--primary)">Review</span></h3>
+    <form id="reviewForm">
+      <input type="hidden" name="service_id" value="{{ service.id }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="form-group"><label>Your Name</label><input name="name" placeholder="Your name" required></div>
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="stars-input" id="starsInput">
+            <i class="fas fa-star" data-val="1"></i><i class="fas fa-star" data-val="2"></i>
+            <i class="fas fa-star" data-val="3"></i><i class="fas fa-star" data-val="4"></i><i class="fas fa-star" data-val="5"></i>
+          </div>
+          <input type="hidden" name="rating" id="ratingVal" value="5">
+        </div>
+      </div>
+      <div class="form-group"><label>Comment</label><textarea name="comment" rows="4" placeholder="Share your experience..." required></textarea></div>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Review</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Star rating
+let rating = 5;
+document.querySelectorAll('#starsInput i').forEach(star => {
+  star.classList.add('active');
+  star.addEventListener('click', () => {
+    rating = +star.dataset.val;
+    document.getElementById('ratingVal').value = rating;
+    document.querySelectorAll('#starsInput i').forEach(s => {
+      s.classList.toggle('active', +s.dataset.val <= rating);
+    });
+  });
+});
+document.getElementById('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const res = await fetch('/review', { method: 'POST', body: fd });
+  const data = await res.json();
+  showToast(data.message);
+  e.target.reset();
+});
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+{% endblock %}

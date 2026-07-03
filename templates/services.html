@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Services - Amman Studio{% endblock %}
+{% block extra_css %}
+<style>
+.page-hero { padding: 160px 5% 80px; text-align: center; background: radial-gradient(ellipse at center, rgba(255,107,53,0.1) 0%, transparent 60%); }
+.page-hero h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 16px; }
+.filter-bar { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 40px 0; }
+.filter-btn { padding: 10px 24px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--muted); cursor: pointer; font-family: 'Poppins',sans-serif; font-size: 0.9rem; transition: all 0.3s; }
+.filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; padding: 0 5% 80px; }
+.service-card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: all 0.4s; }
+.service-card:hover { transform: translateY(-10px); border-color: rgba(255,107,53,0.4); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
+.service-img { height: 200px; background: linear-gradient(135deg, #1a1a1a, #252525); display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; }
+.service-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
+.service-cat { position: absolute; top: 14px; left: 14px; background: var(--primary); color: white; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; z-index: 1; }
+.featured-badge { position: absolute; top: 14px; right: 14px; background: var(--gold); color: #000; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; z-index: 1; }
+.service-body { padding: 24px; }
+.service-body h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+.service-body p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; }
+.service-footer { display: flex; align-items: center; justify-content: space-between; }
+.price { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+.price span { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+.no-results { text-align: center; padding: 80px; color: var(--muted); grid-column: 1/-1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="section-badge animate-fade-up"><i class="fas fa-th-large"></i> All Services</div>
+  <h1 class="animate-fade-up delay-1">Our <span style="color:var(--primary)">Services</span></h1>
+  <p style="color:var(--muted);font-size:1.1rem" class="animate-fade-up delay-2">Professional creative services tailored for your needs</p>
+  <div class="filter-bar">
+    <button class="filter-btn {% if active=='all' %}active{% endif %}" onclick="filterServices('all')">All</button>
+    {% for cat in categories %}
+    <button class="filter-btn {% if active==cat %}active{% endif %}" onclick="filterServices('{{ cat }}')">{{ cat }}</button>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="services-grid" id="servicesGrid">
+  {% for s in services %}
+  <div class="service-card reveal" data-category="{{ s.category }}">
+      <div class="service-img" style="position:relative;overflow:hidden;">
+        <span class="service-cat">{{ s.category }}</span>
+        {% if s.featured %}<span class="featured-badge">Featured</span>{% endif %}
+        {% if s.category == 'Photography' %}
+          <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&q=80" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0.7">
+        {% elif s.category == 'Video' %}
+          <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&q=80" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0.7">
+        {% elif s.category == 'Design' %}
+          <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0.7">
+        {% elif s.category == 'Web' %}
+          <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&q=80" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0.7">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:0.7">
+        {% endif %}
+    </div>
+    <div class="service-body">
+      <h3>{{ s.name }}</h3>
+      <p>{{ s.description }}</p>
+      <div class="service-footer">
+        <div class="price">₹{{ s.price|int }}<span>/service</span></div>
+        <a href="/service/{{ s.id }}" class="btn btn-primary" style="padding:10px 20px;font-size:0.85rem"><i class="fas fa-arrow-right"></i> Details</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="no-results"><i class="fas fa-search" style="font-size:3rem;margin-bottom:16px;display:block"></i>No services found.</div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterServices(cat) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const url = cat === 'all' ? '/services' : `/services?category=${cat}`;
+  window.location.href = url;
+}
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+{% endblock %}

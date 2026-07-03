@@ -1,0 +1,230 @@
+{% extends "admin/base.html" %}
+{% block title %}Services{% endblock %}
+{% block page_title %}Manage Services{% endblock %}
+{% block extra_css %}
+<style>
+/* Edit Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+.modal-overlay.open { display:flex; }
+.modal { background:#1a1a1a; border-radius:20px; padding:36px; width:100%; max-width:600px; border:1px solid rgba(255,107,53,0.2); box-shadow:0 40px 100px rgba(0,0,0,0.6); animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes modalIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+.modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.modal-header h3 { font-size:1.2rem; font-weight:800; }
+.modal-close { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.05); border:none; color:#888; font-size:1rem; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; justify-content:center; }
+.modal-close:hover { background:rgba(255,68,68,0.2); color:#ff4444; }
+.modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.modal-group { margin-bottom:16px; }
+.modal-group.full { grid-column:1/-1; }
+.modal-group label { display:block; margin-bottom:6px; font-size:0.82rem; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.5px; }
+.modal-group input, .modal-group select, .modal-group textarea { width:100%; padding:11px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:#e0e0e0; font-family:'Poppins',sans-serif; font-size:0.9rem; transition:all 0.3s; }
+.modal-group input:focus, .modal-group select:focus, .modal-group textarea:focus { outline:none; border-color:#ff6b35; box-shadow:0 0 0 3px rgba(255,107,53,0.1); }
+.modal-group select option { background:#1a1a1a; }
+
+/* Inline price edit */
+.price-cell { display:flex; align-items:center; gap:8px; }
+.price-display { font-weight:700; color:#ff6b35; cursor:pointer; padding:6px 10px; border-radius:8px; transition:background 0.2s; }
+.price-display:hover { background:rgba(255,107,53,0.1); }
+.price-edit-wrap { display:none; align-items:center; gap:6px; }
+.price-edit-wrap.show { display:flex; }
+.price-display.hide { display:none; }
+.price-input { width:100px; padding:6px 10px; background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.4); border-radius:8px; color:#e0e0e0; font-family:'Poppins',sans-serif; font-size:0.9rem; font-weight:700; }
+.price-input:focus { outline:none; }
+.price-save { background:#ff6b35; border:none; color:white; width:28px; height:28px; border-radius:6px; cursor:pointer; font-size:0.75rem; transition:all 0.2s; }
+.price-save:hover { background:#e55a25; }
+.price-cancel { background:rgba(255,255,255,0.05); border:none; color:#888; width:28px; height:28px; border-radius:6px; cursor:pointer; font-size:0.75rem; transition:all 0.2s; }
+.price-cancel:hover { background:rgba(255,68,68,0.15); color:#ff4444; }
+
+/* Search bar */
+.table-search { padding:8px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:10px; color:#e0e0e0; font-family:'Poppins',sans-serif; font-size:0.85rem; width:220px; transition:all 0.3s; }
+.table-search:focus { outline:none; border-color:#ff6b35; }
+
+/* Toast */
+.mini-toast { position:fixed; bottom:24px; right:24px; background:#1a1a1a; color:#e0e0e0; padding:14px 22px; border-radius:12px; border-left:4px solid #ff6b35; box-shadow:0 10px 40px rgba(0,0,0,0.5); transform:translateX(200%); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index:99999; font-size:0.88rem; font-weight:500; }
+.mini-toast.show { transform:translateX(0); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Add Service Form -->
+<div class="form-card">
+  <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:24px"><i class="fas fa-plus" style="color:var(--primary);margin-right:10px"></i>Add New Service</h3>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-grid">
+      <div class="form-group"><label>Service Name</label><input name="name" placeholder="e.g. Wedding Photography" required></div>
+      <div class="form-group"><label>Price (Rs.)</label><input name="price" type="number" placeholder="e.g. 2500" required></div>
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category" required>
+          <option value="">Select Category</option>
+          <option value="Photography">Photography</option>
+          <option value="Video">Video</option>
+          <option value="Design">Design</option>
+          <option value="Web">Web</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Image (optional)</label><input name="image" type="file" accept="image/*"></div>
+      <div class="form-group full"><label>Description</label><textarea name="description" rows="3" placeholder="Describe this service..." required></textarea></div>
+      <div class="form-group"><label><input type="checkbox" name="featured" style="width:auto;margin-right:8px"> Mark as Featured</label></div>
+    </div>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Service</button>
+  </form>
+</div>
+
+<!-- Services Table -->
+<div class="table-card">
+  <div class="table-header">
+    <h3><i class="fas fa-list" style="color:var(--primary);margin-right:10px"></i>All Services ({{ services|length }})</h3>
+    <input type="text" class="table-search" placeholder="Search services..." oninput="searchTable(this.value)">
+  </div>
+  <table id="servicesTable">
+    <thead><tr><th>Service</th><th>Category</th><th>Price <small style="color:#555;font-weight:400">(click to edit)</small></th><th>Featured</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for s in services %}
+      <tr data-name="{{ s.name|lower }}">
+        <td>
+          <strong>{{ s.name }}</strong>
+          <br><small style="color:var(--muted)">{{ s.description[:50] }}...</small>
+        </td>
+        <td><span class="status confirmed">{{ s.category }}</span></td>
+        <td>
+          <div class="price-cell" id="price-cell-{{ s.id }}">
+            <span class="price-display" onclick="editPrice({{ s.id }}, {{ s.price|int }})">Rs.{{ s.price|int }}</span>
+            <div class="price-edit-wrap" id="price-edit-{{ s.id }}">
+              <input class="price-input" id="price-input-{{ s.id }}" type="number" value="{{ s.price|int }}">
+              <button class="price-save" onclick="savePrice({{ s.id }})" title="Save"><i class="fas fa-check"></i></button>
+              <button class="price-cancel" onclick="cancelPrice({{ s.id }})" title="Cancel"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+        </td>
+        <td>{% if s.featured %}<span class="status confirmed">Yes</span>{% else %}<span style="color:var(--muted)">No</span>{% endif %}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-sm btn-primary" onclick="openEdit({{ s.id }}, '{{ s.name }}', {{ s.price|int }}, '{{ s.category }}', '{{ s.description|replace("'", "\\'") }}', {{ s.featured|lower }})">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <a href="/service/{{ s.id }}" target="_blank" class="btn btn-sm btn-success"><i class="fas fa-eye"></i></a>
+          <a href="/admin/services/delete/{{ s.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this service?')"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:40px">No services yet. Add one above!</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-edit" style="color:var(--primary);margin-right:10px"></i>Edit Service</h3>
+      <button class="modal-close" onclick="closeEdit()"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="editForm" method="POST" action="">
+      <div class="modal-grid">
+        <div class="modal-group"><label>Service Name</label><input name="name" id="edit-name" required></div>
+        <div class="modal-group"><label>Price (Rs.)</label><input name="price" id="edit-price" type="number" required></div>
+        <div class="modal-group">
+          <label>Category</label>
+          <select name="category" id="edit-category">
+            <option value="Photography">Photography</option>
+            <option value="Video">Video</option>
+            <option value="Design">Design</option>
+            <option value="Web">Web</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="modal-group">
+          <label>Featured</label>
+          <select name="featured" id="edit-featured">
+            <option value="">Not Featured</option>
+            <option value="on">Featured</option>
+          </select>
+        </div>
+        <div class="modal-group full"><label>Description</label><textarea name="description" id="edit-desc" rows="4" required></textarea></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+        <button type="button" class="btn" style="background:rgba(255,255,255,0.05);color:#888" onclick="closeEdit()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="mini-toast" id="miniToast"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Edit Modal ──
+function openEdit(id, name, price, category, desc, featured) {
+  const form = document.getElementById('editForm');
+  form.action = '/admin/services/edit/' + id;
+  document.getElementById('edit-name').value = name;
+  document.getElementById('edit-price').value = price;
+  document.getElementById('edit-category').value = category;
+  document.getElementById('edit-desc').value = desc;
+  document.getElementById('edit-featured').value = featured ? 'on' : '';
+  document.getElementById('editModal').classList.add('open');
+  document.getElementById('edit-price').focus();
+}
+function closeEdit() {
+  document.getElementById('editModal').classList.remove('open');
+}
+document.getElementById('editModal').addEventListener('click', e => {
+  if(e.target === document.getElementById('editModal')) closeEdit();
+});
+
+// ── Inline Price Edit ──
+function editPrice(id, currentPrice) {
+  const cell = document.getElementById(`price-cell-${id}`);
+  cell.querySelector('.price-display').classList.add('hide');
+  const editWrap = document.getElementById(`price-edit-${id}`);
+  editWrap.classList.add('show');
+  document.getElementById(`price-input-${id}`).focus();
+}
+async function savePrice(id) {
+  const newPrice = document.getElementById(`price-input-${id}`).value;
+  const fd = new FormData();
+  fd.append('price', newPrice);
+  const res = await fetch(`/admin/services/update-price/${id}`, { method:'POST', body:fd });
+  const data = await res.json();
+  if(data.success) {
+    const cell = document.getElementById(`price-cell-${id}`);
+    cell.querySelector('.price-display').textContent = `Rs.${Math.floor(data.price)}`;
+    cancelPrice(id);
+    showMiniToast('Price updated successfully!');
+  }
+}
+function cancelPrice(id) {
+  const cell = document.getElementById(`price-cell-${id}`);
+  cell.querySelector('.price-display').classList.remove('hide');
+  document.getElementById(`price-edit-${id}`).classList.remove('show');
+}
+// Enter key to save price
+document.querySelectorAll('.price-input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    const id = input.id.replace('price-input-', '');
+    if(e.key === 'Enter') savePrice(id);
+    if(e.key === 'Escape') cancelPrice(id);
+  });
+});
+
+// ── Search ──
+function searchTable(q) {
+  document.querySelectorAll('#servicesTable tbody tr').forEach(row => {
+    row.style.display = row.dataset.name.includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// ── Toast ──
+function showMiniToast(msg) {
+  const t = document.getElementById('miniToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+{% endblock %}

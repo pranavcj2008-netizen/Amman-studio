@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% block title %}Reviews{% endblock %}
+{% block page_title %}Manage Reviews{% endblock %}
+{% block content %}
+<div class="table-card">
+  <div class="table-header">
+    <h3><i class="fas fa-star" style="color:var(--primary);margin-right:10px"></i>All Reviews ({{ reviews|length }})</h3>
+  </div>
+  <table>
+    <thead><tr><th>Client</th><th>Service</th><th>Rating</th><th>Comment</th><th>Date</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for r in reviews %}
+      <tr>
+        <td><strong>{{ r.name }}</strong></td>
+        <td>{{ r.service.name if r.service else 'General' }}</td>
+        <td>
+          {% for i in range(r.rating) %}<i class="fas fa-star" style="color:#ffd700;font-size:0.85rem"></i>{% endfor %}
+        </td>
+        <td style="color:var(--muted);font-size:0.85rem;max-width:300px">{{ r.comment[:100] }}</td>
+        <td style="color:var(--muted);font-size:0.8rem">{{ r.created_at.strftime('%d %b %Y') }}</td>
+        <td><span class="status {% if r.approved %}confirmed{% else %}pending{% endif %}">{% if r.approved %}Approved{% else %}Pending{% endif %}</span></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:40px">No reviews yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
