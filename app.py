@@ -268,12 +268,33 @@ def init_db():
             db.session.add(Admin(username="admin", password=generate_password_hash("amman2024")))
         if not Service.query.first():
             sample_services = [
+                # Photography
                 Service(name="Photography Session", description="Professional photography for events, portraits, and products.", price=2500, category="Photography", featured=True),
-                Service(name="Video Editing", description="High quality video editing with effects, transitions and color grading.", price=1500, category="Video", featured=True),
-                Service(name="Logo Design", description="Creative and unique logo design for your brand.", price=999, category="Design", featured=True),
-                Service(name="Website Design", description="Modern, responsive website design and development.", price=5000, category="Web", featured=True),
-                Service(name="Social Media Post", description="Eye-catching social media graphics and content.", price=500, category="Design", featured=False),
                 Service(name="Wedding Photography", description="Complete wedding photography and videography package.", price=15000, category="Photography", featured=True),
+                Service(name="Product Photography", description="High-quality product shots for e-commerce and marketing.", price=3000, category="Photography", featured=False),
+                # Video
+                Service(name="Video Editing", description="High quality video editing with effects, transitions and color grading.", price=1500, category="Video", featured=True),
+                Service(name="Reels & Shorts", description="Engaging short-form video content for Instagram and YouTube.", price=800, category="Video", featured=False),
+                Service(name="Wedding Videography", description="Cinematic wedding films with drone shots and highlights.", price=12000, category="Video", featured=True),
+                # Design
+                Service(name="Logo Design", description="Creative and unique logo design for your brand.", price=999, category="Design", featured=True),
+                Service(name="Social Media Post", description="Eye-catching social media graphics and content.", price=500, category="Design", featured=False),
+                Service(name="Banner & Poster Design", description="Print and digital banners, flyers, and posters.", price=600, category="Design", featured=False),
+                Service(name="Brand Identity Kit", description="Complete branding package — logo, colors, fonts, and guidelines.", price=3500, category="Design", featured=True),
+                # Web
+                Service(name="Website Design", description="Modern, responsive website design and development.", price=5000, category="Web", featured=True),
+                Service(name="E-Commerce Website", description="Full online store with payment gateway integration.", price=12000, category="Web", featured=True),
+                Service(name="Landing Page", description="High-converting single page website for your business.", price=2500, category="Web", featured=False),
+                # Printing
+                Service(name="Business Card Printing", description="Premium quality business cards with custom design.", price=350, category="Printing", featured=False),
+                Service(name="Flex & Banner Printing", description="Large format flex printing for shops, events, and promotions.", price=700, category="Printing", featured=False),
+                Service(name="Brochure Printing", description="Tri-fold and bi-fold brochures with professional design.", price=900, category="Printing", featured=False),
+                # Animation
+                Service(name="Logo Animation", description="Animated logo intro for YouTube, reels, and presentations.", price=1200, category="Animation", featured=True),
+                Service(name="Explainer Video", description="2D animated explainer video for your product or service.", price=4000, category="Animation", featured=False),
+                # Social Media
+                Service(name="Social Media Management", description="Monthly social media handling — posts, stories, and engagement.", price=2000, category="Social Media", featured=True),
+                Service(name="Instagram Theme Design", description="Consistent aesthetic feed design for Instagram profiles.", price=1500, category="Social Media", featured=False),
             ]
             db.session.add_all(sample_services)
         db.session.commit()
