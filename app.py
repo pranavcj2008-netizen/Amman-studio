@@ -277,7 +277,7 @@ def init_db():
                 Service(name="Reels & Shorts", description="Engaging short-form video content for Instagram and YouTube.", price=800, category="Video", featured=False),
                 Service(name="Wedding Videography", description="Cinematic wedding films with drone shots and highlights.", price=12000, category="Video", featured=True),
                 # Design
-                Service(name="Logo Design", description="Creative and unique logo design for your brand.", price=999, category="Design", featured=True),
+                Service(name="Logo Design", description="Creative and unique logo design for your brand — minimal, modern, and memorable.", price=999, category="Design", image="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&q=80", featured=True),
                 Service(name="Social Media Post", description="Eye-catching social media graphics and content.", price=500, category="Design", featured=False),
                 Service(name="Banner & Poster Design", description="Print and digital banners, flyers, and posters.", price=600, category="Design", featured=False),
                 Service(name="Brand Identity Kit", description="Complete branding package — logo, colors, fonts, and guidelines.", price=3500, category="Design", featured=True),
@@ -299,6 +299,8 @@ def init_db():
                 Service(name="Presentation Design", description="Professional PowerPoint and Google Slides design for business and academics.", price=1200, category="Presentation", featured=True),
                 Service(name="Pitch Deck", description="Investor-ready pitch deck with compelling visuals and storytelling.", price=3500, category="Presentation", featured=True),
                 Service(name="Animated Presentation", description="Motion graphics presentation with smooth animations and transitions.", price=2500, category="Presentation", featured=False),
+                Service(name="PPT Presentation", description="Creative and visually stunning PowerPoint presentations for any occasion.", price=499, category="Presentation", image="https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?w=400&q=80", featured=True),
+                Service(name="Word Presentation", description="Professionally formatted Word documents and reports with creative layouts.", price=399, category="Presentation", image="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80", featured=False),
             ]
             db.session.add_all(sample_services)
         db.session.commit()
