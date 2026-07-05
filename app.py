@@ -270,6 +270,9 @@ def init_db():
             sample_services = [
                 # Design
                 Service(name="Logo Design", description="Creative and unique logo design for your brand — minimal, modern, and memorable.", price=999, category="Design", image="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&q=80", featured=True),
+                # Web
+                Service(name="Website Design", description="Modern, fully responsive website design and development for your business.", price=4999, category="Web", image="https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&q=80", featured=True),
+                Service(name="Webpage Design", description="Single page professional web design with clean layout and smooth animations.", price=999, category="Web", image="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=400&q=80", featured=False),
                 # Presentation
                 Service(name="PPT Presentation", description="Creative and visually stunning PowerPoint presentations for any occasion.", price=499, category="Presentation", image="https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?w=400&q=80", featured=True),
                 Service(name="Word Presentation", description="Professionally formatted Word documents and reports with creative layouts.", price=399, category="Presentation", image="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80", featured=False),
