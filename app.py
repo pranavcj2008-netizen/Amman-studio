@@ -295,6 +295,10 @@ def init_db():
                 # Social Media
                 Service(name="Social Media Management", description="Monthly social media handling — posts, stories, and engagement.", price=2000, category="Social Media", featured=True),
                 Service(name="Instagram Theme Design", description="Consistent aesthetic feed design for Instagram profiles.", price=1500, category="Social Media", featured=False),
+                # Presentation
+                Service(name="Presentation Design", description="Professional PowerPoint and Google Slides design for business and academics.", price=1200, category="Presentation", featured=True),
+                Service(name="Pitch Deck", description="Investor-ready pitch deck with compelling visuals and storytelling.", price=3500, category="Presentation", featured=True),
+                Service(name="Animated Presentation", description="Motion graphics presentation with smooth animations and transitions.", price=2500, category="Presentation", featured=False),
             ]
             db.session.add_all(sample_services)
         db.session.commit()
