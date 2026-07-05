@@ -278,9 +278,10 @@ def init_db():
             db.session.add_all(sample_services)
         db.session.commit()
 
+os.makedirs(os.path.join("static", "images"), exist_ok=True)
+init_db()
+
 if __name__ == "__main__":
-    os.makedirs(os.path.join("static", "images"), exist_ok=True)
-    init_db()
     print("\nAmman Studio is running!")
     print("  Website  -> http://localhost:5000")
     print("  Admin    -> http://localhost:5000/admin/login")
