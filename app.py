@@ -276,6 +276,7 @@ def init_db():
                 # Presentation
                 Service(name="PPT Presentation", description="Creative and visually stunning PowerPoint presentations for any occasion.", price=499, category="Presentation", image="https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?w=400&q=80", featured=True),
                 Service(name="Word Presentation", description="Professionally formatted Word documents and reports with creative layouts.", price=399, category="Presentation", image="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80", featured=False),
+                Service(name="Project Presentation", description="Stunning project presentations with creative visuals, charts, and structured storytelling.", price=1999, category="Presentation", image="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80", featured=True),
             ]
             db.session.add_all(sample_services)
         db.session.commit()
