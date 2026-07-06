@@ -226,6 +226,42 @@ def api_services():
         "price": s.price, "category": s.category, "image": s.image, "featured": s.featured
     } for s in services])
 
+# ─── Export Routes ───────────────────────────────────────
+@app.route("/admin/export/excel")
+@admin_required
+def export_excel():
+    from flask import send_file
+    import io
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+
+    # Bookings sheet
+    ws1 = wb.create_sheet("Bookings")
+    ws1.append(["ID", "Name", "Email", "Phone", "Service", "Message", "Status", "Date"])
+    for b in Booking.query.order_by(Booking.created_at.desc()).all():
+        ws1.append([b.id, b.name, b.email, b.phone,
+                    b.service.name if b.service else "",
+                    b.message or "", b.status, str(b.created_at)])
+
+    # Contacts sheet
+    ws2 = wb.create_sheet("Contacts")
+    ws2.append(["ID", "Name", "Email", "Subject", "Message", "Date"])
+    for c in Contact.query.order_by(Contact.created_at.desc()).all():
+        ws2.append([c.id, c.name, c.email, c.subject or "", c.message, str(c.created_at)])
+
+    # Reviews sheet
+    ws3 = wb.create_sheet("Reviews")
+    ws3.append(["ID", "Name", "Rating", "Comment", "Service", "Date"])
+    for r in Review.query.order_by(Review.created_at.desc()).all():
+        ws3.append([r.id, r.name, r.rating, r.comment,
+                    r.service.name if r.service else "", str(r.created_at)])
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return send_file(output, download_name="amman_studio_data.xlsx",
+                     as_attachment=True, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 # ─── Admin Routes ─────────────────────────────────────────
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
