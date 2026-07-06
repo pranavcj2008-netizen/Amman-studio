@@ -6,10 +6,10 @@
 .booking-info h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; }
 .booking-info p { color: var(--muted); line-height: 1.8; margin-bottom: 36px; }
 .info-item { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding: 20px; background: var(--card); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-.info-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,107,53,0.15); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; flex-shrink: 0; }
+.info-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; color: var(--primary-light); font-size: 1.2rem; flex-shrink: 0; }
 .info-text h4 { font-weight: 600; margin-bottom: 4px; }
 .info-text p { color: var(--muted); font-size: 0.85rem; margin: 0; }
-.booking-form-card { background: var(--card); border-radius: 24px; padding: 40px; border: 1px solid rgba(255,107,53,0.15); box-shadow: 0 30px 80px rgba(0,0,0,0.3); }
+.booking-form-card { background: var(--card); border-radius: 24px; padding: 40px; border: 1px solid rgba(124,58,237,0.15); box-shadow: 0 30px 80px rgba(0,0,0,0.3); }
 .form-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 30px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .form-group { margin-bottom: 20px; }
@@ -23,14 +23,14 @@
   transition: all 0.3s;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  outline: none; border-color: var(--primary); background: rgba(255,107,53,0.05);
-  box-shadow: 0 0 0 4px rgba(255,107,53,0.1);
+  outline: none; border-color: var(--primary); background: rgba(124,58,237,0.05);
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.1);
 }
 .form-group select option { background: var(--card); }
-.submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), #e55a25); color: white; border: none; border-radius: 14px; font-family: 'Poppins',sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(255,107,53,0.4); }
+.submit-btn { width: 100%; padding: 16px; background: var(--gradient); color: white; border: none; border-radius: 14px; font-family: 'Inter',sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(124,58,237,0.4); }
 .success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
-.success-card { background: var(--card); border-radius: 24px; padding: 60px 40px; text-align: center; border: 1px solid rgba(255,107,53,0.3); max-width: 400px; animation: fadeUp 0.5s ease; }
+.success-card { background: var(--card); border-radius: 24px; padding: 60px 40px; text-align: center; border: 1px solid rgba(124,58,237,0.3); max-width: 400px; animation: fadeUp 0.5s ease; }
 .success-icon { font-size: 4rem; color: #00c853; margin-bottom: 20px; }
 @media(max-width:768px) { .booking-wrapper { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
 </style>
@@ -97,13 +97,13 @@
           <textarea name="message" id="f_message" rows="4" placeholder="Tell us about your requirements, preferred date/time, etc."></textarea>
         </div>
       </div>
-      <div id="priceDisplay" style="display:none;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+      <div id="priceDisplay" style="display:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
         <span style="color:var(--muted)">Amount to Pay:</span>
         <span id="priceAmt" style="font-size:1.4rem;font-weight:800;color:var(--primary)"></span>
       </div>
 
       <!-- UPI Payment Box -->
-      <div id="upiBox" style="display:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,107,53,0.2);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center">
+      <div id="upiBox" style="display:none;background:rgba(255,255,255,0.03);border:1px solid rgba(124,58,237,0.2);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center">
         <p style="font-weight:700;margin-bottom:6px">Scan & Pay via GPay / UPI</p>
         <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px">UPI ID: <strong style="color:var(--primary)">cjpranav577-1@okaxis</strong></p>
         <img id="upiQr" src="" alt="UPI QR" style="width:180px;height:180px;border-radius:12px;border:3px solid var(--primary);margin-bottom:16px">

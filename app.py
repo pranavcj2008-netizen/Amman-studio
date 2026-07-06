@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import os, datetime, json, openpyxl
-from openpyxl import load_workbook
 
 app = Flask(__name__)
 app.secret_key = "amman_studio_secret_2024"
@@ -71,19 +70,29 @@ class Admin(db.Model):
 
 # ─── Helpers ──────────────────────────────────────────────
 # ─── Excel Helper ─────────────────────────────────────────
-def save_to_excel(sheet_name, headers, row_data):
+def save_to_excel():
     os.makedirs("instance", exist_ok=True)
-    if os.path.exists(EXCEL_FILE):
-        wb = load_workbook(EXCEL_FILE)
-    else:
-        wb = openpyxl.Workbook()
-        wb.remove(wb.active)
-    if sheet_name not in wb.sheetnames:
-        ws = wb.create_sheet(sheet_name)
-        ws.append(headers)
-    else:
-        ws = wb[sheet_name]
-    ws.append(row_data)
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+
+    ws1 = wb.create_sheet("Bookings")
+    ws1.append(["ID", "Name", "Email", "Phone", "Service", "Message", "Status", "Date"])
+    for b in Booking.query.order_by(Booking.created_at.asc()).all():
+        ws1.append([b.id, b.name, b.email, b.phone,
+                    b.service.name if b.service else "",
+                    b.message or "", b.status, str(b.created_at)])
+
+    ws2 = wb.create_sheet("Contacts")
+    ws2.append(["ID", "Name", "Email", "Subject", "Message", "Date"])
+    for c in Contact.query.order_by(Contact.created_at.asc()).all():
+        ws2.append([c.id, c.name, c.email, c.subject or "", c.message, str(c.created_at)])
+
+    ws3 = wb.create_sheet("Reviews")
+    ws3.append(["ID", "Name", "Rating", "Comment", "Service", "Date"])
+    for r in Review.query.order_by(Review.created_at.asc()).all():
+        ws3.append([r.id, r.name, r.rating, r.comment,
+                    r.service.name if r.service else "", str(r.created_at)])
+
     wb.save(EXCEL_FILE)
 
 def allowed_file(filename):
@@ -139,11 +148,7 @@ def booking():
         )
         db.session.add(b)
         db.session.commit()
-        service_name = b.service.name if b.service else ""
-        save_to_excel("Bookings",
-            ["ID", "Name", "Email", "Phone", "Service", "Message", "Status", "Date"],
-            [b.id, b.name, b.email, b.phone, service_name, b.message, b.status, str(b.created_at)]
-        )
+        save_to_excel()
         return jsonify({"success": True, "message": "Booking confirmed! We'll contact you soon."})
     return render_template("booking.html", services=services)
 
@@ -158,10 +163,7 @@ def contact():
         )
         db.session.add(c)
         db.session.commit()
-        save_to_excel("Contacts",
-            ["ID", "Name", "Email", "Subject", "Message", "Date"],
-            [c.id, c.name, c.email, c.subject, c.message, str(c.created_at)]
-        )
+        save_to_excel()
         return jsonify({"success": True, "message": "Message sent! We'll reply within 24 hours."})
     return render_template("contact.html")
 
@@ -175,11 +177,7 @@ def add_review():
     )
     db.session.add(r)
     db.session.commit()
-    service_name = r.service.name if r.service else ""
-    save_to_excel("Reviews",
-        ["ID", "Name", "Rating", "Comment", "Service", "Date"],
-        [r.id, r.name, r.rating, r.comment, service_name, str(r.created_at)]
-    )
+    save_to_excel()
     return jsonify({"success": True, "message": "Thank you for your review!"})
 
 # ─── Payment Routes ──────────────────────────────────────
@@ -210,11 +208,7 @@ def verify_payment():
     )
     db.session.add(b)
     db.session.commit()
-    service_name = b.service.name if b.service else ""
-    save_to_excel("Bookings",
-        ["ID", "Name", "Email", "Phone", "Service", "Message", "Status", "Payment ID", "Date"],
-        [b.id, b.name, b.email, b.phone, service_name, b.message, "paid", data.get("razorpay_payment_id", ""), str(b.created_at)]
-    )
+    save_to_excel()
     return jsonify({"success": True})
 
 # ─── API ──────────────────────────────────────────────────
