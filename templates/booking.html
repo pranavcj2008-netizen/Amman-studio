@@ -4,36 +4,77 @@
 <style>
 .booking-wrapper { padding: 140px 5% 80px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 60px; align-items: start; }
 .booking-info h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; }
-.booking-info p { color: var(--muted); line-height: 1.8; margin-bottom: 36px; }
-.info-item { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding: 20px; background: var(--card); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-.info-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; color: var(--primary-light); font-size: 1.2rem; flex-shrink: 0; }
-.info-text h4 { font-weight: 600; margin-bottom: 4px; }
-.info-text p { color: var(--muted); font-size: 0.85rem; margin: 0; }
-.booking-form-card { background: var(--card); border-radius: 24px; padding: 40px; border: 1px solid rgba(124,58,237,0.15); box-shadow: 0 30px 80px rgba(0,0,0,0.3); }
-.form-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 30px; }
+.booking-info p { color: var(--muted2); line-height: 1.8; margin-bottom: 36px; }
+.info-item { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; padding: 18px 20px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; }
+.info-item:hover { border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.05); }
+.info-icon { width: 46px; height: 46px; border-radius: 12px; background: rgba(124,58,237,0.15); display: flex; align-items: center; justify-content: center; color: var(--primary-light); font-size: 1.1rem; flex-shrink: 0; }
+.info-text h4 { font-weight: 600; margin-bottom: 3px; font-size: 0.95rem; }
+.info-text p { color: var(--muted); font-size: 0.83rem; margin: 0; }
+
+.booking-form-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border-radius: 24px; padding: 40px; border: 1px solid rgba(124,58,237,0.2); box-shadow: 0 30px 80px rgba(0,0,0,0.4); }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.form-group { margin-bottom: 20px; }
+.form-group { margin-bottom: 4px; }
 .form-group.full { grid-column: 1/-1; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text); }
-.form-group label span { color: var(--primary); }
-.form-group input, .form-group select, .form-group textarea {
-  width: 100%; padding: 14px 18px;
-  background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08);
-  border-radius: 12px; color: var(--text); font-family: 'Inter',sans-serif; font-size: 0.95rem;
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: var(--muted2); letter-spacing: 0.3px; }
+.form-group label span { color: var(--primary-light); }
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  color: #f1f5f9;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.93rem;
   transition: all 0.3s;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  outline: none; border-color: var(--primary); background: rgba(124,58,237,0.05);
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.1);
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: #475569; }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #7c3aed;
+  background: rgba(124,58,237,0.08);
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.12);
+  color: #f1f5f9;
 }
-.form-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 44px; appearance: none; -webkit-appearance: none; }
+.form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 42px;
+  cursor: pointer;
+}
 .form-group select option { background: #0c0f1d; color: #f1f5f9; }
-.submit-btn { width: 100%; padding: 16px; background: var(--gradient); color: white; border: none; border-radius: 14px; font-family: 'Inter',sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(124,58,237,0.4); }
-.success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
-.success-card { background: var(--card); border-radius: 24px; padding: 60px 40px; text-align: center; border: 1px solid rgba(124,58,237,0.3); max-width: 400px; animation: fadeUp 0.5s ease; }
-.success-icon { font-size: 4rem; color: #00c853; margin-bottom: 20px; }
-@media(max-width:768px) { .booking-wrapper { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
+
+.price-display { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+.price-display span:first-child { color: var(--muted2); font-size: 0.9rem; }
+.price-display .price-amt { font-size: 1.5rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.upi-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(124,58,237,0.2); border-radius: 16px; padding: 28px; margin-bottom: 20px; text-align: center; }
+.upi-box p { font-weight: 700; margin-bottom: 6px; }
+.upi-id { color: var(--primary-light); font-weight: 700; font-size: 1rem; }
+
+.submit-btn { width: 100%; padding: 15px; background: var(--gradient); color: white; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.3px; }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(124,58,237,0.45); }
+.submit-btn.secondary { background: transparent; border: 1.5px solid rgba(255,255,255,0.12); color: var(--muted2); margin-top: 12px; }
+.submit-btn.secondary:hover { border-color: rgba(124,58,237,0.4); color: var(--primary-light); box-shadow: none; transform: translateY(-1px); }
+
+.success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.success-card { background: rgba(12,15,29,0.95); border-radius: 24px; padding: 60px 40px; text-align: center; border: 1px solid rgba(124,58,237,0.3); max-width: 400px; box-shadow: 0 40px 100px rgba(0,0,0,0.6); animation: fadeUpIn 0.5s ease; }
+.success-icon { font-size: 4rem; color: #10b981; margin-bottom: 20px; }
+
+@media(max-width:768px) {
+  .booking-wrapper { grid-template-columns: 1fr; padding-top: 120px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .booking-form-card { padding: 28px 20px; }
+}
 </style>
 {% endblock %}
 
@@ -41,14 +82,14 @@
 <div class="booking-wrapper">
   <div class="booking-info animate-fade-up">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px">
-      <img src="/static/images/pranav.jpg" alt="Pranav" style="width:70px;height:70px;border-radius:50%;border:3px solid var(--primary);padding:4px;background:var(--card);object-fit:cover">
+      <img src="/static/images/pranav.jpg" alt="Pranav" style="width:68px;height:68px;border-radius:50%;border:2px solid rgba(124,58,237,0.6);padding:3px;background:rgba(255,255,255,0.04);object-fit:cover">
       <div>
-        <h4 style="font-weight:800">Pranav</h4>
-        <p style="color:var(--primary);font-size:0.82rem;font-weight:600">Founder, Amman Studio</p>
+        <h4 style="font-weight:800;font-size:1rem">Pranav</h4>
+        <p style="color:var(--primary-light);font-size:0.8rem;font-weight:600;margin:0">Founder, Amman Studio</p>
       </div>
     </div>
     <div class="section-badge"><i class="fas fa-calendar-check"></i> Book a Service</div>
-    <h1>Let's <span style="color:var(--primary)">Create</span> Together</h1>
+    <h1>Let's <span style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Create</span> Together</h1>
     <p>Fill out the form and we'll get back to you within 2-4 hours to confirm your booking.</p>
     <div class="info-item">
       <div class="info-icon"><i class="fas fa-clock"></i></div>
@@ -64,12 +105,12 @@
     </div>
     <div class="info-item">
       <div class="info-icon"><i class="fas fa-phone"></i></div>
-      <div class="info-text"><h4>Direct Contact</h4><p>+91 00000 00000 · ammanstudio@gmail.com</p></div>
+      <div class="info-text"><h4>Direct Contact</h4><p>+91 73392 78064 · pranavcj2008@gmail.com</p></div>
     </div>
   </div>
 
   <div class="booking-form-card animate-fade-up delay-2">
-    <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:30px">Book a <span style="color:var(--primary)">Service</span></h2>
+    <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:28px">Book a <span style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Service</span></h2>
     <form id="bookingForm">
       <div class="form-grid">
         <div class="form-group">
@@ -89,7 +130,7 @@
           <select name="service_id" id="f_service" required>
             <option value="">-- Choose a Service --</option>
             {% for s in services %}
-            <option value="{{ s.id }}" data-price="{{ s.price|int }}" {% if request.args.get('service')|int == s.id %}selected{% endif %}>{{ s.name }} - ₹{{ s.price|int }}</option>
+            <option value="{{ s.id }}" data-price="{{ s.price|int }}" {% if request.args.get('service')|int == s.id %}selected{% endif %}>{{ s.name }} — ₹{{ s.price|int }}</option>
             {% endfor %}
           </select>
         </div>
@@ -98,25 +139,26 @@
           <textarea name="message" id="f_message" rows="4" placeholder="Tell us about your requirements, preferred date/time, etc."></textarea>
         </div>
       </div>
-      <div id="priceDisplay" style="display:none;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
-        <span style="color:var(--muted)">Amount to Pay:</span>
-        <span id="priceAmt" style="font-size:1.4rem;font-weight:800;color:var(--primary)"></span>
+
+      <div id="priceDisplay" class="price-display" style="display:none">
+        <span>Amount to Pay:</span>
+        <span class="price-amt" id="priceAmt"></span>
       </div>
 
-      <!-- UPI Payment Box -->
-      <div id="upiBox" style="display:none;background:rgba(255,255,255,0.03);border:1px solid rgba(124,58,237,0.2);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center">
-        <p style="font-weight:700;margin-bottom:6px">Scan & Pay via GPay / UPI</p>
-        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px">UPI ID: <strong style="color:var(--primary)">cjpranav577-1@okaxis</strong></p>
-        <img id="upiQr" src="" alt="UPI QR" style="width:180px;height:180px;border-radius:12px;border:3px solid var(--primary);margin-bottom:16px">
+      <div id="upiBox" class="upi-box" style="display:none">
+        <p>Scan &amp; Pay via GPay / UPI</p>
+        <p style="color:var(--muted2);font-size:0.85rem;margin-bottom:16px">UPI ID: <span class="upi-id">cjpranav577-1@okaxis</span></p>
+        <img id="upiQr" src="" alt="UPI QR" style="width:180px;height:180px;border-radius:12px;border:2px solid rgba(124,58,237,0.5);margin-bottom:16px">
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
           <a id="gpayLink" href="" class="btn btn-primary" style="font-size:0.85rem;padding:10px 20px"><i class="fab fa-google-pay"></i> Open GPay</a>
-          <button type="button" id="copyUpiBtn" class="btn btn-outline" style="font-size:0.85rem;padding:10px 20px" onclick="navigator.clipboard.writeText('cjpranav577-1@okaxis');showToast('UPI ID copied!')"><i class="fas fa-copy"></i> Copy UPI ID</button>
+          <button type="button" class="btn btn-outline" style="font-size:0.85rem;padding:10px 20px" onclick="navigator.clipboard.writeText('cjpranav577-1@okaxis');showToast('UPI ID copied!')"><i class="fas fa-copy"></i> Copy UPI ID</button>
         </div>
-        <p style="color:var(--muted);font-size:0.8rem;margin-top:14px">After payment, click <strong>Confirm Booking</strong> below</p>
-        <button type="button" id="confirmAfterPay" class="submit-btn" style="margin-top:12px"><i class="fas fa-check-circle"></i> Confirm Booking After Payment</button>
+        <p style="color:var(--muted);font-size:0.8rem;margin-top:14px">After payment, click <strong style="color:var(--primary-light)">Confirm Booking</strong> below</p>
+        <button type="button" id="confirmAfterPay" class="submit-btn" style="margin-top:14px"><i class="fas fa-check-circle"></i> Confirm Booking After Payment</button>
       </div>
+
       <button type="submit" class="submit-btn"><i class="fas fa-mobile-alt"></i> Pay via GPay / UPI</button>
-      <button type="button" id="skipPayBtn" class="submit-btn" style="margin-top:12px;background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:var(--muted)"><i class="fas fa-calendar-check"></i> Book Without Payment</button>
+      <button type="button" id="skipPayBtn" class="submit-btn secondary"><i class="fas fa-calendar-check"></i> Book Without Payment</button>
     </form>
   </div>
 </div>
@@ -124,8 +166,8 @@
 <div class="success-overlay" id="successOverlay">
   <div class="success-card">
     <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-    <h2 style="margin-bottom:12px">Booking Confirmed!</h2>
-    <p style="color:var(--muted);margin-bottom:28px">Thank you! We'll contact you within 2-4 hours to confirm your appointment.</p>
+    <h2 style="margin-bottom:12px;font-family:'Space Grotesk',sans-serif">Booking Confirmed!</h2>
+    <p style="color:var(--muted2);margin-bottom:28px">Thank you! We'll contact you within 2-4 hours to confirm your appointment.</p>
     <a href="/" class="btn btn-primary"><i class="fas fa-home"></i> Back to Home</a>
   </div>
 </div>
@@ -137,14 +179,12 @@ const UPI_ID = 'cjpranav577-1@okaxis';
 const UPI_NAME = 'Amman Studio';
 
 document.getElementById('f_service').addEventListener('change', function() {
-  const opt = this.options[this.selectedIndex];
-  const price = opt.dataset.price;
+  const price = this.options[this.selectedIndex].dataset.price;
   const pd = document.getElementById('priceDisplay');
   const upiBox = document.getElementById('upiBox');
   if (price) {
-    document.getElementById('priceAmt').textContent = '\u20b9' + parseInt(price).toLocaleString('en-IN');
+    document.getElementById('priceAmt').textContent = '₹' + parseInt(price).toLocaleString('en-IN');
     pd.style.display = 'flex';
-    // Generate QR
     const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${price}&cu=INR`;
     document.getElementById('upiQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
     document.getElementById('gpayLink').href = upiUrl;
@@ -165,18 +205,14 @@ function getFormData() {
   };
 }
 
-// Show UPI box on Pay button click
 document.getElementById('bookingForm').addEventListener('submit', e => {
   e.preventDefault();
   const d = getFormData();
-  if (!d.name || !d.phone || !d.email || !d.service_id) {
-    showToast('Please fill all required fields', true); return;
-  }
+  if (!d.name || !d.phone || !d.email || !d.service_id) { showToast('Please fill all required fields', true); return; }
   document.getElementById('upiBox').style.display = 'block';
   document.getElementById('upiBox').scrollIntoView({ behavior: 'smooth' });
 });
 
-// Confirm after UPI payment
 document.getElementById('confirmAfterPay').addEventListener('click', async () => {
   const d = getFormData();
   const btn = document.getElementById('confirmAfterPay');
@@ -195,12 +231,9 @@ document.getElementById('confirmAfterPay').addEventListener('click', async () =>
   }
 });
 
-// Book without payment
 document.getElementById('skipPayBtn').addEventListener('click', async () => {
   const d = getFormData();
-  if (!d.name || !d.phone || !d.email || !d.service_id) {
-    showToast('Please fill all required fields', true); return;
-  }
+  if (!d.name || !d.phone || !d.email || !d.service_id) { showToast('Please fill all required fields', true); return; }
   const btn = document.getElementById('skipPayBtn');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
   btn.disabled = true;
