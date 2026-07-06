@@ -7,7 +7,12 @@ from openpyxl import load_workbook
 
 app = Flask(__name__)
 app.secret_key = "amman_studio_secret_2024"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///amman_studio.db"
+
+# Use PostgreSQL on Render, SQLite locally
+database_url = os.environ.get("DATABASE_URL", "sqlite:///amman_studio.db")
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "images")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
