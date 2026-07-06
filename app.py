@@ -143,7 +143,7 @@ def booking():
             name=request.form["name"],
             email=request.form["email"],
             phone=request.form["phone"],
-            service_id=request.form["service_id"],
+            service_id=int(request.form["service_id"]) if request.form.get("service_id") else None,
             message=request.form.get("message", "")
         )
         db.session.add(b)
