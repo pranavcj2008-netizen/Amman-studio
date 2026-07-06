@@ -14,6 +14,7 @@ if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 300}
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "images")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 app.config["RAZORPAY_KEY_ID"] = "rzp_test_YourKeyHere"
@@ -281,9 +282,12 @@ def admin_services():
 @app.route("/admin/services/delete/<int:id>")
 @admin_required
 def delete_service(id):
-    s = Service.query.get_or_404(id)
-    db.session.delete(s)
-    db.session.commit()
+    try:
+        s = Service.query.get_or_404(id)
+        db.session.delete(s)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
     return redirect(url_for("admin_services"))
 
 @app.route("/admin/services/edit/<int:id>", methods=["GET", "POST"])
@@ -291,12 +295,15 @@ def delete_service(id):
 def edit_service(id):
     s = Service.query.get_or_404(id)
     if request.method == "POST":
-        s.name = request.form.get("name", s.name)
-        s.price = float(request.form.get("price", s.price))
-        s.description = request.form.get("description", s.description)
-        s.category = request.form.get("category", s.category)
-        s.featured = request.form.get("featured") == "on"
-        db.session.commit()
+        try:
+            s.name = request.form.get("name", s.name)
+            s.price = float(request.form.get("price", s.price))
+            s.description = request.form.get("description", s.description)
+            s.category = request.form.get("category", s.category)
+            s.featured = request.form.get("featured") == "on"
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
         return redirect(url_for("admin_services"))
     return redirect(url_for("admin_services"))
 
@@ -317,9 +324,12 @@ def admin_bookings():
 @app.route("/admin/bookings/status/<int:id>/<status>")
 @admin_required
 def update_booking_status(id, status):
-    b = Booking.query.get_or_404(id)
-    b.status = status
-    db.session.commit()
+    try:
+        b = Booking.query.get_or_404(id)
+        b.status = status
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
     return redirect(url_for("admin_bookings"))
 
 @app.route("/admin/contacts")
