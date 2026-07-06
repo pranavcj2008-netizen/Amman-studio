@@ -22,6 +22,7 @@
           <a href="/admin/bookings/status/{{ b.id }}/confirmed" class="btn btn-success btn-sm">Confirm</a>
           <a href="/admin/bookings/status/{{ b.id }}/completed" class="btn btn-sm" style="background:rgba(33,150,243,0.15);color:#2196f3">Done</a>
           <a href="/admin/bookings/status/{{ b.id }}/cancelled" class="btn btn-danger btn-sm">Cancel</a>
+          <a href="/admin/bookings/delete/{{ b.id }}" class="btn btn-sm" style="background:rgba(255,0,0,0.15);color:#ff4444" onclick="return confirm('Delete this booking?')"><i class="fas fa-trash"></i></a>
         </td>
       </tr>
       {% else %}

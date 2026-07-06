@@ -357,6 +357,17 @@ def admin_bookings():
     bookings = Booking.query.order_by(Booking.created_at.desc()).all()
     return render_template("admin/bookings.html", bookings=bookings)
 
+@app.route("/admin/bookings/delete/<int:id>")
+@admin_required
+def delete_booking(id):
+    try:
+        b = Booking.query.get_or_404(id)
+        db.session.delete(b)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+    return redirect(url_for("admin_bookings"))
+
 @app.route("/admin/bookings/status/<int:id>/<status>")
 @admin_required
 def update_booking_status(id, status):
