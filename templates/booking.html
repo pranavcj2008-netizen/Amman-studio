@@ -101,7 +101,20 @@
         <span style="color:var(--muted)">Amount to Pay:</span>
         <span id="priceAmt" style="font-size:1.4rem;font-weight:800;color:var(--primary)"></span>
       </div>
-      <button type="submit" class="submit-btn"><i class="fas fa-lock"></i> Pay & Confirm Booking</button>
+
+      <!-- UPI Payment Box -->
+      <div id="upiBox" style="display:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,107,53,0.2);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center">
+        <p style="font-weight:700;margin-bottom:6px">Scan & Pay via GPay / UPI</p>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px">UPI ID: <strong style="color:var(--primary)">cjpranav577-1@okaxis</strong></p>
+        <img id="upiQr" src="" alt="UPI QR" style="width:180px;height:180px;border-radius:12px;border:3px solid var(--primary);margin-bottom:16px">
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <a id="gpayLink" href="" class="btn btn-primary" style="font-size:0.85rem;padding:10px 20px"><i class="fab fa-google-pay"></i> Open GPay</a>
+          <button type="button" id="copyUpiBtn" class="btn btn-outline" style="font-size:0.85rem;padding:10px 20px" onclick="navigator.clipboard.writeText('cjpranav577-1@okaxis');showToast('UPI ID copied!')"><i class="fas fa-copy"></i> Copy UPI ID</button>
+        </div>
+        <p style="color:var(--muted);font-size:0.8rem;margin-top:14px">After payment, click <strong>Confirm Booking</strong> below</p>
+        <button type="button" id="confirmAfterPay" class="submit-btn" style="margin-top:12px"><i class="fas fa-check-circle"></i> Confirm Booking After Payment</button>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-mobile-alt"></i> Pay via GPay / UPI</button>
       <button type="button" id="skipPayBtn" class="submit-btn" style="margin-top:12px;background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:var(--muted)"><i class="fas fa-calendar-check"></i> Book Without Payment</button>
     </form>
   </div>
@@ -118,17 +131,26 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+const UPI_ID = 'cjpranav577-1@okaxis';
+const UPI_NAME = 'Amman Studio';
+
 document.getElementById('f_service').addEventListener('change', function() {
   const opt = this.options[this.selectedIndex];
   const price = opt.dataset.price;
   const pd = document.getElementById('priceDisplay');
+  const upiBox = document.getElementById('upiBox');
   if (price) {
     document.getElementById('priceAmt').textContent = '\u20b9' + parseInt(price).toLocaleString('en-IN');
     pd.style.display = 'flex';
+    // Generate QR
+    const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${price}&cu=INR`;
+    document.getElementById('upiQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+    document.getElementById('gpayLink').href = upiUrl;
+    upiBox.style.display = 'none';
   } else {
     pd.style.display = 'none';
+    upiBox.style.display = 'none';
   }
 });
 
@@ -141,6 +163,36 @@ function getFormData() {
     message: document.getElementById('f_message').value
   };
 }
+
+// Show UPI box on Pay button click
+document.getElementById('bookingForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const d = getFormData();
+  if (!d.name || !d.phone || !d.email || !d.service_id) {
+    showToast('Please fill all required fields', true); return;
+  }
+  document.getElementById('upiBox').style.display = 'block';
+  document.getElementById('upiBox').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Confirm after UPI payment
+document.getElementById('confirmAfterPay').addEventListener('click', async () => {
+  const d = getFormData();
+  const btn = document.getElementById('confirmAfterPay');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming...';
+  btn.disabled = true;
+  const fd = new FormData();
+  Object.entries(d).forEach(([k,v]) => fd.append(k, v));
+  const res = await fetch('/booking', { method: 'POST', body: fd });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('successOverlay').style.display = 'flex';
+  } else {
+    showToast('Something went wrong. Try again.', true);
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Booking After Payment';
+    btn.disabled = false;
+  }
+});
 
 // Book without payment
 document.getElementById('skipPayBtn').addEventListener('click', async () => {
@@ -162,52 +214,6 @@ document.getElementById('skipPayBtn').addEventListener('click', async () => {
     btn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Without Payment';
     btn.disabled = false;
   }
-});
-
-// Pay with Razorpay
-document.getElementById('bookingForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const d = getFormData();
-  if (!d.service_id) { showToast('Please select a service', true); return; }
-  const btn = e.target.querySelector('.submit-btn');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-  btn.disabled = true;
-  const fd = new FormData();
-  fd.append('service_id', d.service_id);
-  const res = await fetch('/payment/initiate', { method: 'POST', body: fd });
-  const data = await res.json();
-  if (!data.success) {
-    showToast('Payment init failed. Try again.', true);
-    btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Confirm Booking';
-    btn.disabled = false;
-    return;
-  }
-  const options = {
-    key: data.key,
-    amount: data.amount,
-    currency: data.currency,
-    name: 'Amman Studio',
-    description: data.service_name,
-    image: '/static/images/pranav.jpg',
-    handler: async function(response) {
-      const verifyRes = await fetch('/payment/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...d, razorpay_payment_id: response.razorpay_payment_id })
-      });
-      const vData = await verifyRes.json();
-      if (vData.success) document.getElementById('successOverlay').style.display = 'flex';
-    },
-    prefill: { name: d.name, email: d.email, contact: d.phone },
-    theme: { color: '#ff6b35' },
-    modal: {
-      ondismiss: function() {
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Confirm Booking';
-        btn.disabled = false;
-      }
-    }
-  };
-  new Razorpay(options).open();
 });
 </script>
 {% endblock %}
