@@ -102,6 +102,7 @@
         <span id="priceAmt" style="font-size:1.4rem;font-weight:800;color:var(--primary)"></span>
       </div>
       <button type="submit" class="submit-btn"><i class="fas fa-lock"></i> Pay & Confirm Booking</button>
+      <button type="button" id="skipPayBtn" class="submit-btn" style="margin-top:12px;background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:var(--muted)"><i class="fas fa-calendar-check"></i> Book Without Payment</button>
     </form>
   </div>
 </div>
@@ -119,7 +120,6 @@
 {% block extra_js %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-// Show price when service selected
 document.getElementById('f_service').addEventListener('change', function() {
   const opt = this.options[this.selectedIndex];
   const price = opt.dataset.price;
@@ -132,32 +132,56 @@ document.getElementById('f_service').addEventListener('change', function() {
   }
 });
 
+function getFormData() {
+  return {
+    name: document.getElementById('f_name').value,
+    email: document.getElementById('f_email').value,
+    phone: document.getElementById('f_phone').value,
+    service_id: document.getElementById('f_service').value,
+    message: document.getElementById('f_message').value
+  };
+}
+
+// Book without payment
+document.getElementById('skipPayBtn').addEventListener('click', async () => {
+  const d = getFormData();
+  if (!d.name || !d.phone || !d.email || !d.service_id) {
+    showToast('Please fill all required fields', true); return;
+  }
+  const btn = document.getElementById('skipPayBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
+  btn.disabled = true;
+  const fd = new FormData();
+  Object.entries(d).forEach(([k,v]) => fd.append(k, v));
+  const res = await fetch('/booking', { method: 'POST', body: fd });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('successOverlay').style.display = 'flex';
+  } else {
+    showToast('Something went wrong. Try again.', true);
+    btn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Without Payment';
+    btn.disabled = false;
+  }
+});
+
+// Pay with Razorpay
 document.getElementById('bookingForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const d = getFormData();
+  if (!d.service_id) { showToast('Please select a service', true); return; }
   const btn = e.target.querySelector('.submit-btn');
-  const name = document.getElementById('f_name').value;
-  const email = document.getElementById('f_email').value;
-  const phone = document.getElementById('f_phone').value;
-  const service_id = document.getElementById('f_service').value;
-  const message = document.getElementById('f_message').value;
-
-  if (!service_id) { showToast('Please select a service', true); return; }
-
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
   btn.disabled = true;
-
   const fd = new FormData();
-  fd.append('service_id', service_id);
+  fd.append('service_id', d.service_id);
   const res = await fetch('/payment/initiate', { method: 'POST', body: fd });
   const data = await res.json();
-
   if (!data.success) {
     showToast('Payment init failed. Try again.', true);
     btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Confirm Booking';
     btn.disabled = false;
     return;
   }
-
   const options = {
     key: data.key,
     amount: data.amount,
@@ -169,17 +193,12 @@ document.getElementById('bookingForm').addEventListener('submit', async e => {
       const verifyRes = await fetch('/payment/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name, email, phone, service_id, message,
-          razorpay_payment_id: response.razorpay_payment_id
-        })
+        body: JSON.stringify({ ...d, razorpay_payment_id: response.razorpay_payment_id })
       });
       const vData = await verifyRes.json();
-      if (vData.success) {
-        document.getElementById('successOverlay').style.display = 'flex';
-      }
+      if (vData.success) document.getElementById('successOverlay').style.display = 'flex';
     },
-    prefill: { name, email, contact: phone },
+    prefill: { name: d.name, email: d.email, contact: d.phone },
     theme: { color: '#ff6b35' },
     modal: {
       ondismiss: function() {
@@ -188,8 +207,7 @@ document.getElementById('bookingForm').addEventListener('submit', async e => {
       }
     }
   };
-  const rzp = new Razorpay(options);
-  rzp.open();
+  new Razorpay(options).open();
 });
 </script>
 {% endblock %}
