@@ -73,31 +73,35 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Full Name <span>*</span></label>
-          <input name="name" placeholder="Your full name" required>
+          <input name="name" id="f_name" placeholder="Your full name" required>
         </div>
         <div class="form-group">
           <label>Phone Number <span>*</span></label>
-          <input name="phone" type="tel" placeholder="+91 00000 00000" required>
+          <input name="phone" id="f_phone" type="tel" placeholder="+91 00000 00000" required>
         </div>
         <div class="form-group">
           <label>Email Address <span>*</span></label>
-          <input name="email" type="email" placeholder="your@email.com" required>
+          <input name="email" id="f_email" type="email" placeholder="your@email.com" required>
         </div>
         <div class="form-group">
           <label>Select Service <span>*</span></label>
-          <select name="service_id" required>
+          <select name="service_id" id="f_service" required>
             <option value="">-- Choose a Service --</option>
             {% for s in services %}
-            <option value="{{ s.id }}" {% if request.args.get('service')|int == s.id %}selected{% endif %}>{{ s.name }} - ₹{{ s.price|int }}</option>
+            <option value="{{ s.id }}" data-price="{{ s.price|int }}" {% if request.args.get('service')|int == s.id %}selected{% endif %}>{{ s.name }} - ₹{{ s.price|int }}</option>
             {% endfor %}
           </select>
         </div>
         <div class="form-group full">
           <label>Message / Requirements</label>
-          <textarea name="message" rows="4" placeholder="Tell us about your requirements, preferred date/time, etc."></textarea>
+          <textarea name="message" id="f_message" rows="4" placeholder="Tell us about your requirements, preferred date/time, etc."></textarea>
         </div>
       </div>
-      <button type="submit" class="submit-btn"><i class="fas fa-calendar-check"></i> Confirm Booking</button>
+      <div id="priceDisplay" style="display:none;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <span style="color:var(--muted)">Amount to Pay:</span>
+        <span id="priceAmt" style="font-size:1.4rem;font-weight:800;color:var(--primary)"></span>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-lock"></i> Pay & Confirm Booking</button>
     </form>
   </div>
 </div>
@@ -113,22 +117,79 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+// Show price when service selected
+document.getElementById('f_service').addEventListener('change', function() {
+  const opt = this.options[this.selectedIndex];
+  const price = opt.dataset.price;
+  const pd = document.getElementById('priceDisplay');
+  if (price) {
+    document.getElementById('priceAmt').textContent = '\u20b9' + parseInt(price).toLocaleString('en-IN');
+    pd.style.display = 'flex';
+  } else {
+    pd.style.display = 'none';
+  }
+});
+
 document.getElementById('bookingForm').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = e.target.querySelector('.submit-btn');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  const name = document.getElementById('f_name').value;
+  const email = document.getElementById('f_email').value;
+  const phone = document.getElementById('f_phone').value;
+  const service_id = document.getElementById('f_service').value;
+  const message = document.getElementById('f_message').value;
+
+  if (!service_id) { showToast('Please select a service', true); return; }
+
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
   btn.disabled = true;
-  const fd = new FormData(e.target);
-  const res = await fetch('/booking', { method: 'POST', body: fd });
+
+  const fd = new FormData();
+  fd.append('service_id', service_id);
+  const res = await fetch('/payment/initiate', { method: 'POST', body: fd });
   const data = await res.json();
-  if (data.success) {
-    document.getElementById('successOverlay').style.display = 'flex';
-  } else {
-    showToast('Something went wrong. Please try again.', true);
-    btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm Booking';
+
+  if (!data.success) {
+    showToast('Payment init failed. Try again.', true);
+    btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Confirm Booking';
     btn.disabled = false;
+    return;
   }
+
+  const options = {
+    key: data.key,
+    amount: data.amount,
+    currency: data.currency,
+    name: 'Amman Studio',
+    description: data.service_name,
+    image: '/static/images/pranav.jpg',
+    handler: async function(response) {
+      const verifyRes = await fetch('/payment/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name, email, phone, service_id, message,
+          razorpay_payment_id: response.razorpay_payment_id
+        })
+      });
+      const vData = await verifyRes.json();
+      if (vData.success) {
+        document.getElementById('successOverlay').style.display = 'flex';
+      }
+    },
+    prefill: { name, email, contact: phone },
+    theme: { color: '#ff6b35' },
+    modal: {
+      ondismiss: function() {
+        btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Confirm Booking';
+        btn.disabled = false;
+      }
+    }
+  };
+  const rzp = new Razorpay(options);
+  rzp.open();
 });
 </script>
 {% endblock %}

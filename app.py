@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import os, datetime, json
+import os, datetime, json, openpyxl
+from openpyxl import load_workbook
 
 app = Flask(__name__)
 app.secret_key = "amman_studio_secret_2024"
@@ -10,6 +11,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///amman_studio.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "images")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
+app.config["RAZORPAY_KEY_ID"] = "rzp_test_YourKeyHere"
+app.config["RAZORPAY_KEY_SECRET"] = "YourSecretHere"
+EXCEL_FILE = os.path.join("instance", "amman_data.xlsx")
 
 db = SQLAlchemy(app)
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -60,6 +64,22 @@ class Admin(db.Model):
     password = db.Column(db.String(200), nullable=False)
 
 # ─── Helpers ──────────────────────────────────────────────
+# ─── Excel Helper ─────────────────────────────────────────
+def save_to_excel(sheet_name, headers, row_data):
+    os.makedirs("instance", exist_ok=True)
+    if os.path.exists(EXCEL_FILE):
+        wb = load_workbook(EXCEL_FILE)
+    else:
+        wb = openpyxl.Workbook()
+        wb.remove(wb.active)
+    if sheet_name not in wb.sheetnames:
+        ws = wb.create_sheet(sheet_name)
+        ws.append(headers)
+    else:
+        ws = wb[sheet_name]
+    ws.append(row_data)
+    wb.save(EXCEL_FILE)
+
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -113,6 +133,11 @@ def booking():
         )
         db.session.add(b)
         db.session.commit()
+        service_name = b.service.name if b.service else ""
+        save_to_excel("Bookings",
+            ["ID", "Name", "Email", "Phone", "Service", "Message", "Status", "Date"],
+            [b.id, b.name, b.email, b.phone, service_name, b.message, b.status, str(b.created_at)]
+        )
         return jsonify({"success": True, "message": "Booking confirmed! We'll contact you soon."})
     return render_template("booking.html", services=services)
 
@@ -127,6 +152,10 @@ def contact():
         )
         db.session.add(c)
         db.session.commit()
+        save_to_excel("Contacts",
+            ["ID", "Name", "Email", "Subject", "Message", "Date"],
+            [c.id, c.name, c.email, c.subject, c.message, str(c.created_at)]
+        )
         return jsonify({"success": True, "message": "Message sent! We'll reply within 24 hours."})
     return render_template("contact.html")
 
@@ -140,7 +169,47 @@ def add_review():
     )
     db.session.add(r)
     db.session.commit()
+    service_name = r.service.name if r.service else ""
+    save_to_excel("Reviews",
+        ["ID", "Name", "Rating", "Comment", "Service", "Date"],
+        [r.id, r.name, r.rating, r.comment, service_name, str(r.created_at)]
+    )
     return jsonify({"success": True, "message": "Thank you for your review!"})
+
+# ─── Payment Routes ──────────────────────────────────────
+@app.route("/payment/initiate", methods=["POST"])
+def initiate_payment():
+    service_id = request.form.get("service_id")
+    s = Service.query.get(service_id)
+    if not s:
+        return jsonify({"success": False, "message": "Service not found"})
+    return jsonify({
+        "success": True,
+        "key": app.config["RAZORPAY_KEY_ID"],
+        "amount": int(s.price * 100),
+        "service_name": s.name,
+        "currency": "INR"
+    })
+
+@app.route("/payment/verify", methods=["POST"])
+def verify_payment():
+    data = request.get_json()
+    b = Booking(
+        name=data.get("name"),
+        email=data.get("email"),
+        phone=data.get("phone"),
+        service_id=data.get("service_id"),
+        message=data.get("message", ""),
+        status="paid"
+    )
+    db.session.add(b)
+    db.session.commit()
+    service_name = b.service.name if b.service else ""
+    save_to_excel("Bookings",
+        ["ID", "Name", "Email", "Phone", "Service", "Message", "Status", "Payment ID", "Date"],
+        [b.id, b.name, b.email, b.phone, service_name, b.message, "paid", data.get("razorpay_payment_id", ""), str(b.created_at)]
+    )
+    return jsonify({"success": True})
 
 # ─── API ──────────────────────────────────────────────────
 @app.route("/api/services")
@@ -266,6 +335,16 @@ def init_db():
         db.create_all()
         if not Admin.query.first():
             db.session.add(Admin(username="admin", password=generate_password_hash("amman2024")))
+        if not Review.query.first():
+            sample_reviews = [
+                Review(name="Rahul Sharma", rating=5, comment="Amazing work! Amman Studio delivered exactly what I wanted. Highly recommended!", approved=True),
+                Review(name="Priya Nair", rating=5, comment="The best design service. Professional team, beautiful results!", approved=True),
+                Review(name="Arjun Patel", rating=5, comment="Logo design was perfect. They understood my brand vision completely. Great team!", approved=True),
+                Review(name="Meena Krishnan", rating=5, comment="PPT presentation was stunning! Got great feedback from my professors.", approved=True),
+                Review(name="Vikram Das", rating=5, comment="Website design exceeded my expectations. Very professional and fast delivery!", approved=True),
+                Review(name="Sneha Reddy", rating=5, comment="Word document was neatly formatted and delivered on time. Will use again!", approved=True),
+            ]
+            db.session.add_all(sample_reviews)
         if not Service.query.first():
             sample_services = [
                 # Design
